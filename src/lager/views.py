@@ -1,8 +1,27 @@
 from datetime import datetime, timedelta
 from django.shortcuts import render
-from .forms import ArtikkelForm
+
+from .forms import ArtikkelForm, TestForm
+from .models import Artikkel
 
 # Create your views here.
+def test(request):
+    if request.method == 'POST':
+        form = TestForm(request.POST)
+        if form.is_valid():
+            decision = True
+            form.save()
+            instance = form.save()
+            queryset = Artikkel.objects.get(pk = instance.pk)
+        context = {'decision': decision, 'form': form, 'queryset': queryset}
+
+    else:
+        form = TestForm()
+        context = {'form': form}
+
+    return render(request, 'test.html', context)
+
+
 def main(request):
     if request.method == 'POST': # hva som skal skje når skjemaet sendes
         lagerkost = 0.05

@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # Thirdparty apps
     'bootstrapform',
+    'bootstrap_datepicker_plus',
     # RK Apps
     'lager',
 ]

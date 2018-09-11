@@ -1,0 +1,6 @@
+site_name: Reservedelslager Returkraft
+nav:
+  - Hjem: index.md
+  - Kom i gang: kom_i_gang.md
+
+theme: readthedocs

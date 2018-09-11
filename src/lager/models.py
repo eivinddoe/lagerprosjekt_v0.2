@@ -13,9 +13,10 @@ class FastParameter(models.Model):
 		('Kost ved stans i strømproduksjon', 'Kost ved stans i strømproduksjon'),
 		('Weibull Shape Parameter', 'Weibull Shape Parameter'),
 		('Weibull Scale Parameter', 'Weibull Scale Parameter'),
+		('Avkastningskrav', 'Avkastningskrav'),
 		)
 	parameter = models.CharField(max_length = 40, choices = PARAMETER_VALG, unique = True, null = True)
-	parameter_verdi = models.DecimalField(max_digits = 10, decimal_places = 2, null = True)
+	parameter_verdi = models.DecimalField(max_digits = 10, decimal_places = 3, null = True)
 
 	class Meta:
 		verbose_name_plural = 'Faste parametere'
