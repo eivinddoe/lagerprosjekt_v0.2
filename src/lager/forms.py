@@ -20,6 +20,8 @@ class TestForm(ModelForm):
 		'leveringstid': forms.TextInput(attrs= {'placeholder': 	''}),
 		'sist_byttet': DatePickerInput(format='%m/%d/%Y'),
 		'planlagt_byttet': DatePickerInput(format='%m/%d/%Y'),
+		'forbrenning_konsekvens': forms.CheckboxInput(attrs={'id': 'forbrenning'}),
+		'stromprod_konsekvens': forms.CheckboxInput(attrs={'id': 'strom'}),
 		'forbrenning_grad': forms.TextInput(attrs= {'placeholder': 	'0-100 (%)'}),
 		'stromprod_grad': forms.TextInput(attrs= {'placeholder': 	'0-100 (%)'}),
 		'kost_alternativ_drift': forms.TextInput(attrs= {'placeholder': 	'kr'})

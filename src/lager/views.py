@@ -1,8 +1,12 @@
 from datetime import datetime, timedelta
+from django.http import JsonResponse
 from django.shortcuts import render
 
 from .forms import ArtikkelForm, TestForm
-from .models import Artikkel
+# from .functions import Nedetidskost, WeibullCDF, ProbNede, ProbSurvival
+from .models import Artikkel, FastParameter
+
+import json
 
 # Create your views here.
 def test(request):
@@ -21,7 +25,6 @@ def test(request):
         context = {'form': form}
 
     return render(request, 'test.html', context)
-
 
 def main(request):
     if request.method == 'POST': # hva som skal skje når skjemaet sendes

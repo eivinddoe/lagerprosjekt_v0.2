@@ -2,6 +2,9 @@ from datetime import datetime, timedelta
 from django.db import models
 from django.db.models.signals import pre_save
 
+from .functions import Nedetidskost, WeibullCDF, ProbNede, ProbSurvival
+
+import json
 import math
 
 # Models
@@ -10,6 +13,7 @@ class FastParameter(models.Model):
 	PARAMETER_VALG = (
 		('Lagerkost', 'Lagerkost'),
 		('Kost ved driftsstans (gatefee)', 'Kost ved driftsstans (gatefee)'),
+		('Variabel driftskostnad per døgn', 'Variabel driftskostnad per døgn'),
 		('Kost ved stans i strømproduksjon', 'Kost ved stans i strømproduksjon'),
 		('Weibull Shape Parameter', 'Weibull Shape Parameter'),
 		('Weibull Scale Parameter', 'Weibull Scale Parameter'),
@@ -66,6 +70,12 @@ class Artikkel(models.Model):
 	lager = models.BooleanField('Skal bestilles', null = True, blank = True, default = False)
 	kritisk_dato = models.DateField('Kritisk dato', null = True, blank = True)
 
+	vektet_risiko = models.TextField(null = True, blank = True)
+	tid = models.TextField(null = True, blank = True)
+
+	vektet_lagerkost = models.TextField(null = True, blank = True)
+
+
 	class Meta:
 		ordering = ['art_nr']
 		verbose_name_plural = 'artikler'
@@ -86,13 +96,14 @@ def pre_save_artikkel_receiver(sender, instance, *args, **kwargs):
 		kost_gatefee_idag = int(FastParameter.objects.get(parameter = 'Kost ved driftsstans (gatefee)').parameter_verdi)
 		diskonteringsfaktor = (1 + float(FastParameter.objects.get(parameter = 'Avkastningskrav').parameter_verdi)) ** 30
 		kost_gatefee = kost_gatefee_idag / diskonteringsfaktor
+		vk_drift = int(FastParameter.objects.get(parameter = 'Variabel driftskostnad per døgn').parameter_verdi)
 
 		kost_stromprod = int(FastParameter.objects.get(parameter = 'Kost ved stans i strømproduksjon').parameter_verdi)
 
 		kost_defekt = 0
 
 		if instance.forbrenning_konsekvens:
-			kost_defekt += (instance.forbrenning_grad/100) * kost_gatefee
+			kost_defekt += (instance.forbrenning_grad/100) * (kost_gatefee - vk_drift)
 		if instance.stromprod_konsekvens:
 			kost_defekt += (instance.stromprod_grad/100) * kost_stromprod
 		if instance.kost_alternativ_drift:
@@ -114,23 +125,18 @@ def pre_save_artikkel_receiver(sender, instance, *args, **kwargs):
 				instance.lager = True
 				instance.kritisk_dato = datetime.today().date()
 			else:
-				def WeibullCDF(x, lmbd, k):
-					q = pow(x / lmbd, k)
-					return 1.0 - math.exp(-q)
-
 				weib_shape = int(FastParameter.objects.get(parameter = 'Weibull Shape Parameter').parameter_verdi)
-				cdf_start = WeibullCDF(tid_inne, levetid, weib_shape)
-				survival_start = 1 - cdf_start
-
-				p_nede = []
-				p_survival = []
-				for i in range(tid_inne, levetid):
-					p_nede.append((WeibullCDF(i, levetid, weib_shape) - cdf_start) / survival_start)
-					p_survival.append((1 - WeibullCDF(i, levetid, weib_shape)))
+				p_nede = ProbNede(tid_inne, levetid, 5)
+				p_survival = ProbSurvival(tid_inne, levetid, weib_shape)
 
 				# Beregne vektet nedetidskostnad
 				kost_defekt = float(kost_defekt)
-				vektet_nedetidskost = [i * kost_defekt for i in p_nede]
+				vektet_nedetidskost = Nedetidskost(kost_defekt, instance.leveringstid, p_nede)
+				instance.vektet_risiko = json.dumps(vektet_nedetidskost)
+
+				instance.tid = json.dumps([str(datetime.today().date() + timedelta(days=i)) for i in range(0, (instance.levetid-instance.tid_inne))])
+
+				#instance.tid = json.dumps(list(range(0,(instance.levetid-instance.tid_inne))))
 
 				# Beregne vektet lagerkostnad
 				if instance.skal_byttes == 'Sikkert':
@@ -143,6 +149,8 @@ def pre_save_artikkel_receiver(sender, instance, *args, **kwargs):
 				lagerkost_dag = lagerkost_aar / 365
 				vektet_lagerkostnad_dag = [i * lagerkost_dag for i in p_survival]
 				vektet_lagerkost = [sum(vektet_lagerkostnad_dag[i:max_lagertid]) for i in range(0, max_lagertid)]
+
+				instance.vektet_lagerkost = json.dumps(vektet_lagerkost)
 
 				i = 0
 				while vektet_nedetidskost[i] < vektet_lagerkost[i]:

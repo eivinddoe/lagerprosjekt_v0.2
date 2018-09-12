@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     # Thirdparty apps
     'bootstrapform',
     'bootstrap_datepicker_plus',
+    'chartjs',
+    'fontawesome',
     # RK Apps
     'lager',
 ]
