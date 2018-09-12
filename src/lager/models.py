@@ -55,10 +55,10 @@ class Artikkel(models.Model):
 	levetid_aar = models.IntegerField('Levetid i år', null = True)
 	levetid = models.IntegerField('Levetid i dager', blank = True, null = True)
 
-	forbrenning_konsekvens = models.BooleanField(null = True, default = False)
-	forbrenning_grad = models.DecimalField(max_digits = 2, decimal_places = 1, null = True, blank = True)
-	stromprod_konsekvens = models.BooleanField(null = True, default = False)
-	stromprod_grad = models.DecimalField(max_digits = 2, decimal_places = 1, null = True, blank = True)
+	forbrenning_konsekvens = models.BooleanField(default = False)
+	forbrenning_grad = models.IntegerField(null = True, blank = True)
+	stromprod_konsekvens = models.BooleanField(default = False)
+	stromprod_grad = models.IntegerField(null = True, blank = True)
 
 	kost_alternativ_drift = models.IntegerField('Kostnad (per døgn) ved alternativ drift', 
 		blank = True, null = True)
@@ -83,15 +83,18 @@ def pre_save_artikkel_receiver(sender, instance, *args, **kwargs):
 
 		# Kostnad ved defekt
 		# Hente parameterverdier for stanskost
-		kost_gatefee = int(FastParameter.objects.get(parameter = 'Kost ved driftsstans (gatefee)').parameter_verdi)
+		kost_gatefee_idag = int(FastParameter.objects.get(parameter = 'Kost ved driftsstans (gatefee)').parameter_verdi)
+		diskonteringsfaktor = (1 + float(FastParameter.objects.get(parameter = 'Avkastningskrav').parameter_verdi)) ** 30
+		kost_gatefee = kost_gatefee_idag / diskonteringsfaktor
+
 		kost_stromprod = int(FastParameter.objects.get(parameter = 'Kost ved stans i strømproduksjon').parameter_verdi)
 
 		kost_defekt = 0
 
 		if instance.forbrenning_konsekvens:
-			kost_defekt += instance.forbrenning_grad * kost_gatefee
+			kost_defekt += (instance.forbrenning_grad/100) * kost_gatefee
 		if instance.stromprod_konsekvens:
-			kost_defekt += instance.stromprod_grad * kost_stromprod
+			kost_defekt += (instance.stromprod_grad/100) * kost_stromprod
 		if instance.kost_alternativ_drift:
 			kost_defekt += instance.kost_alternativ_drift
 

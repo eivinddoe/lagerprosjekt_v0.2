@@ -1,6 +1,6 @@
 site_name: Reservedelslager Returkraft
 nav:
   - Hjem: index.md
-  - Kom i gang: kom_i_gang.md
+  - Bakgrunn for vurdering: bakgrunn_for_vurdering.md
 
 theme: readthedocs

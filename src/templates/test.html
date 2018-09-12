@@ -17,11 +17,18 @@
 
 </head>
 
+
+{% if request.user.is_authenticated %}
+
 {{ form.media }}
 
 <body>
-	<div class="container" />
-	<h1>Beta</h1>
+
+<!-- Content here -->
+	<div class="container-fluid" />
+	<div class="row">
+	<h1>Beslutningsverktøy for lagerhold</h1>
+</div>
 	<div class="row">
 	<div class="col-sm-6">
 	<form role="form" method="POST" enctype="multipart/form-data" />
@@ -63,12 +70,12 @@
 	{{ form.forbrenning_konsekvens|bootstrap }}
 </div>
 <div class="col-sm-6">
-	{{ form.forbrenning_grad|bootstrap }}
+	{{ form.stromprod_konsekvens|bootstrap }}
 </div>
 </div>
 	<div class="row">
 	<div class="col-sm-6">
-	{{ form.stromprod_konsekvens|bootstrap }}
+	{{ form.forbrenning_grad|bootstrap }}
 </div>
 <div class="col-sm-6">
 	{{ form.stromprod_grad|bootstrap }}
@@ -79,16 +86,36 @@
 	{{ form.kost_alternativ_drift|bootstrap }}
 </div>
 </div>
-	<button type="SUMBIT" class="btn btn-success">Send</button>
-</form>
+
+	
+	<button type="SUMBIT" class="btn btn-primary">Send</button>
+	<button type="RESET" class="btn btn-secondary">Tøm skjema</button>
 
 </div>
+</form>
+
+
 
 
 {% if decision %}
 <div class="col-sm-6">
 
-<h3>Betadata:</h3>
+<h3>Vurdering:</h3>
+<p>
+	Du har vurdert artikkel nummer {{ queryset.art_nr }}. 
+
+	{% if queryset.lager %}
+	Reservedelen bør være på lager fra og med {{ queryset.kritisk_dato }}, og bør bestilles nå ettersom leveringstiden er {{ queryset.leveringstid }} uker.
+	{% endif %}
+
+	{% if queryset.kostnad_ved_defekt > 0 and not queryset.lager %}
+	Reservedelen skal ikke ligge på lager ennå, men bør være på lager fra og med {{ queryset.kritisk_dato }}.
+	{% endif %}
+
+	{% if queryset.kostnad_ved_defekt == 0 %}
+	Reservedelen skal ikke ligge på lager.
+	{% endif %}
+
 <p>
 	Art.nr.: {{ queryset.art_nr }}<br />
 	Tid for vurdering: {{ queryset.tid_for_vurdering }}<br />
@@ -104,9 +131,19 @@
 	Levetid (år): {{ queryset.levetid_aar }}<br />
 	Levetid (dager): {{queryset.levetid }}<br />
 	Kritisk dato: {{ queryset.kritisk_dato }}<br />
-	Lager: {{ queryset.lager }}
+	Lager: {% if queryset.lager %} Skal bestilles {% else %} Skal ikke bestilles {% endif %}
 </p></div>
 {% endif %}
 </div>
+</div>
+</div>
 </body>
+
+{% else %}
+
+<body>
+	<p>Logg inn
+	</body>
+
+	{% endif %}
 </html>

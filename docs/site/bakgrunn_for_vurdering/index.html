@@ -8,7 +8,7 @@
   
   
   <link rel="shortcut icon" href="../img/favicon.ico">
-  <title>Kom i gang - Reservedelslager Returkraft</title>
+  <title>Bakgrunn for vurdering - Reservedelslager Returkraft</title>
   <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
 
   <link rel="stylesheet" href="../css/theme.css" type="text/css" />
@@ -17,8 +17,8 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "Kom i gang";
-    var mkdocs_page_input_path = "kom_i_gang.md";
+    var mkdocs_page_name = "Bakgrunn for vurdering";
+    var mkdocs_page_input_path = "bakgrunn_for_vurdering.md";
     var mkdocs_page_url = null;
   </script>
   
@@ -55,10 +55,18 @@
           
             <li class="toctree-l1 current">
 		
-    <a class="current" href="./">Kom i gang</a>
+    <a class="current" href="./">Bakgrunn for vurdering</a>
     <ul class="subnav">
             
-    <li class="toctree-l2"><a href="#kom-i-gang">Kom i gang</a></li>
+    <li class="toctree-l2"><a href="#bakgrunn-for-vurdering">Bakgrunn for vurdering</a></li>
+    
+        <ul>
+        
+            <li><a class="toctree-l3" href="#overordnet-vurdering">Overordnet vurdering</a></li>
+        
+            <li><a class="toctree-l3" href="#risiko-ved-a-ikke-ha-reservedel-pa-lager">Risiko ved å ikke ha reservedel på lager</a></li>
+        
+        </ul>
     
 
     </ul>
@@ -86,7 +94,7 @@
     
       
     
-    <li>Kom i gang</li>
+    <li>Bakgrunn for vurdering</li>
     <li class="wy-breadcrumbs-aside">
       
     </li>
@@ -96,8 +104,24 @@
           <div role="main">
             <div class="section">
               
-                <h1 id="kom-i-gang">Kom i gang</h1>
-<p>Her kommer en enkel brukerveiledning.</p>
+                <h1 id="bakgrunn-for-vurdering">Bakgrunn for vurdering</h1>
+<p>I denne delen forklares hvordan beslutningsverktøyet kommer frem til vurderingen av kritisk dato og hvorvidt en reservedel skal bestilles/ikke bestilles (til lager). </p>
+<h2 id="overordnet-vurdering">Overordnet vurdering</h2>
+<p>Dataen som mates inn i modellen blir brukt til å vurdere to ting:</p>
+<ol>
+<li>Hvilken risiko tar Returkraft på seg ved å ikke ha reservedel på lager</li>
+<li>Hvilken lagerkostnad tar Returkraft på seg ved å ha reservedel på lager</li>
+</ol>
+<p>Disse to faktorene blir sannsynlighetsvektet og satt opp mot hverandre, og modellen skal si at en reservedel skal holdes på lager fra og med den dagen hvor risikoen Returkraft tar på seg er større enn lagerkostnaden.</p>
+<h2 id="risiko-ved-a-ikke-ha-reservedel-pa-lager">Risiko ved å ikke ha reservedel på lager</h2>
+<p>For å vurdere hvilken risiko Returkraft tar på seg ved å ikke ha en reservedel på lager, er det spesielt tre ting å ta hensyn til:</p>
+<ol>
+<li>Vil defekt føre til stans i avfallsforbrenning?</li>
+<li>Vil defekt føre til stans i strømproduksjon?</li>
+<li>Hvor lang tid vil det ta å fremskaffe ny del?</li>
+</ol>
+<p>Ved stans i avfallsforbrenning regner verktøyet med en tapt gatefee på kr 550 000 per døgn. Dette tapet er justert ned til kroner i dag med en viss <em>diskonteringsrente</em>, foreløpig satt til 3.5% pr år. Selv om en defekt fører til stans i avfallsforbrenning, vil en kunne motta avfall en viss tid (frem til bunkers er full). Tapet vil med andre ord ikke komme umiddelbart ved defekt, men idet bunkers er full. I denne versjonen av verktøyet antas det at en kan motta avfall frem til defekten er reparert, og tapet vil ikke oppstå før anlegget ev. stenges ned permanent. Et tap på kr 550 000 om 30 år er verdt ca halvparten, og det er denne verdien som ligger til grunn i verktøyet.</p>
+<p><img alt="Tapt gatefee avhenger av tid for tap" src="../img/tapt_gatefee.png" /></p>
               
             </div>
           </div>

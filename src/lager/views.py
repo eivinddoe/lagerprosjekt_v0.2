@@ -13,8 +13,9 @@ def test(request):
             form.save()
             instance = form.save()
             queryset = Artikkel.objects.get(pk = instance.pk)
-        context = {'decision': decision, 'form': form, 'queryset': queryset}
-
+            context = {'decision': decision, 'form': form, 'queryset': queryset}
+        else:
+            context = {'form': form}
     else:
         form = TestForm()
         context = {'form': form}
