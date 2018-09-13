@@ -24,7 +24,7 @@ def test(request):
         form = TestForm()
         context = {'form': form}
 
-    return render(request, 'test.html', context)
+    return render(request, 'index.html', context)
 
 def main(request):
     if request.method == 'POST': # hva som skal skje når skjemaet sendes

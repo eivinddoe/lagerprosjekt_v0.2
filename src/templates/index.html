@@ -1,10 +1,35 @@
-{% extends 'base/base.html' %}
-
-{% block content %}
 {% load bootstrap %}
+<!doctype html>
+
+<html>
+<head>
+
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js" crossorigin="anonymous"></script>
+
+</head>
+
+
 {{ form.media }}
+
+<body>
+
+<!-- Content here -->
+	<div class="container" />
+
 <div class="row">
+	<div class="col-sm-8">
 	<h1>Beslutningsverktøy for delelager</h1>
+</div>
 </div>
 
 <div class="row">
@@ -44,11 +69,16 @@
 </div>
 </div>
 	<div class="row">
+	<div class="col-sm-6">
+	{{ form.kost_alternativ_drift|bootstrap }}
+</div>
+</div>
+	<div class="row">
 	<div class="col-sm-6" style="margin-bottom:40px;">
 	{{ form.forbrenning_konsekvens|bootstrap }}
 </div>
 
-	<div class="col-sm-6" style="display: none;" id="gradforbrenning">
+	<div class="col-sm-6" {% if not decision %}style="display: none;"{% endif %} id="gradforbrenning">
 	{{ form.forbrenning_grad|bootstrap }}
 </div>
 </div>
@@ -56,27 +86,118 @@
 <div class="col-sm-6" style="margin-bottom:40px">
 	{{ form.stromprod_konsekvens|bootstrap }}
 </div>
-<div class="col-sm-6" style="display: none;" id="gradstrom">
+<div class="col-sm-6" {% if not decision %}style="display: none;"{% endif %} id="gradstrom">
 	{{ form.stromprod_grad|bootstrap }}
 </div>
 </div>
-	<div class="row">
-	<div class="col-sm-6">
-	{{ form.kost_alternativ_drift|bootstrap }}
-</div>
-</div>
+
 	<button type="SUMBIT" class="btn btn-primary">Send</button>
 	<button type="RESET" class="btn btn-secondary">Tøm skjema</button>
 
 </form>
 
+<script>
+
+$(function () {
+	$('#forbrenning').click(function() {
+		if( $(this).is(':checked')) {
+			$('#gradforbrenning').show();
+		} else {
+			$('#gradforbrenning').hide();
+		}
+	});
+});
+
+$(function () {
+	$('#strom').click(function() {
+		if( $(this).is(':checked')) {
+			$('#gradstrom').show();
+		} else {
+			$('#gradstrom').hide();
+		}
+	});
+});
+	</script>
+
 	</div>
 </div>
-
+{% if decision %}
 <div class="row">
 	<div class="col-sm-12" style="margin-top: 50px;">
 		<h3>Rapport</h3>
 	</div>
 </div>
+	<div class="row">
+		<div class="col-sm-12">
 
-{% endblock %}
+Tid for rapport: {{ queryset.tid_for_vurdering }}.
+
+Du har vurdert artikkel nummer {{ queryset.art_nr }}. 
+
+{% if queryset.lager %}
+Sannsynlighetsvektet risiko målt opp mot lagerkostnad tilsier at reservedelen bør være på lager fra og med {{ queryset.kritisk_dato }}. Delen bør bestilles nå ettersom leveringstiden er {{ queryset.leveringstid }} uker.
+{% endif %}
+
+{% if queryset.kostnad_ved_defekt > 0 and not queryset.lager %}
+Reservedelen skal ikke ligge på lager ennå, men sannsynlighetsvektet risiko tilsier at delen bør være på lager fra og med {{ queryset.kritisk_dato }}. 
+{% endif %}
+
+{% if queryset.kostnad_ved_defekt == 0 %}
+Delen er ikke kritisk, og lagerkostnaden vil alltid være større enn risikoen en tar på seg ved å ikke ha delen på lager. Reservedelen skal ikke ligge på lager.
+{% endif %}
+
+	</div>
+
+</div>
+
+<div class="row">
+	<div class="col-sm-12">
+				<canvas id="line-chart" width="300" height="200"></canvas>
+	</div>
+</div>
+
+<script>
+var ctx = document.getElementById('line-chart');
+var tid = JSON.parse('{{ queryset.tid|safe }}');
+var vektet_risiko = JSON.parse('{{ queryset.vektet_risiko|safe }}');
+var vektet_lagerkost = JSON.parse('{{ queryset.vektet_lagerkost|safe }}');
+var lineChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+	labels: tid,
+	datasets: [
+		{
+		data: vektet_risiko,
+		label: 'Vektet risiko',
+		borderColor: "#c45850",
+		pointRadius: 0,
+		fill: false
+		},
+		{
+		data: vektet_lagerkost,
+		label: 'Vektet lagerkost',
+		borderColor: "#3e95cd",
+		pointRadius: 0,
+		fill: false
+		}
+            	]
+		},
+	options: {
+		title: {
+			display: true,
+			text: 'Vektet risiko mot vektet lagerkost'
+		}
+	}
+    }
+    )
+</script>
+
+
+
+{% endif %}
+
+	</div>
+
+</body>
+
+</html>
