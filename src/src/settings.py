@@ -41,7 +41,6 @@ INSTALLED_APPS = [
     'bootstrapform',
     'bootstrap_datepicker_plus',
     'chartjs',
-    'fontawesome',
     # RK Apps
     'lager',
 ]

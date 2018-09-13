@@ -20,15 +20,12 @@
 
 </head>
 
-
-{% if request.user.is_authenticated %}
-
 {{ form.media }}
-
 <body>
 
 <!-- Content here -->
-	<div class="container-fluid" />
+	<div class="container" />
+
 	<div class="row">
 	<h1>Beslutningsverktøy for lagerhold</h1>
 </div>
@@ -187,11 +184,4 @@ var lineChart = new Chart(ctx, {
 </div>
 </body>
 
-{% else %}
-
-<body>
-	<p>Logg inn
-	</body>
-
-	{% endif %}
 </html>
