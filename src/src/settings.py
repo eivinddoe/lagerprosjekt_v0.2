@@ -25,7 +25,7 @@ SECRET_KEY = 'i9%1nc@jxasu)rivx$dx62%e*b=@02481u#y&+@eur*e+#0sbx'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['delelager.fodo.io']
 
 
 # Application definition
