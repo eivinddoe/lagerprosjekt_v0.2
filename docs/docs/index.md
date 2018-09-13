@@ -5,8 +5,8 @@ Dokumentasjonen tar for seg hvordan beslutningsverktøyet er bygget opp, og hvor
 
 For øyeblikket er verktøyet i *betaversjon*, og det er kritisk at verktøyet tester og at eventuelle feil og mangler meldes videre. 
 
-Tilbakemeldinger sendes til [returkraft@fodo.io](mailto:returkraft@fodo.io).
+Tilbakemeldinger sendes i dedikert tilbakemeldingsskjema i beslutningsverktøyet.
 
 # Kom i gang
 
-Beslutningsverktøyet bor på [https://lager.returkraft.no](https://lager.returkraft.no/).
+Beslutningsverktøyet bor på [http://lager.returkraft.no](https://lager.returkraft.no/).

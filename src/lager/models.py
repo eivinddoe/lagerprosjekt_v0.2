@@ -170,3 +170,10 @@ def pre_save_artikkel_receiver(sender, instance, *args, **kwargs):
 
 
 pre_save.connect(pre_save_artikkel_receiver, sender = Artikkel)
+
+class Feedback(models.Model):
+	name = models.CharField(max_length = 20)
+	feedback = models.TextField()
+
+	def __str__(self):
+		return self.name

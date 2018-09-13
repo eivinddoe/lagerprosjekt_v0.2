@@ -21,4 +21,5 @@ from . import views
 urlpatterns = [
     path('', views.test),
     path('test', views.test),
+    path('feedback', views.feed),
 ]

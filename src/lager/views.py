@@ -2,9 +2,9 @@ from datetime import datetime, timedelta
 from django.http import JsonResponse
 from django.shortcuts import render
 
-from .forms import ArtikkelForm, TestForm
+from .forms import ArtikkelForm, TestForm, FeedbackForm
 # from .functions import Nedetidskost, WeibullCDF, ProbNede, ProbSurvival
-from .models import Artikkel, FastParameter
+from .models import Artikkel, FastParameter, Feedback
 
 import json
 
@@ -25,6 +25,21 @@ def test(request):
         context = {'form': form}
 
     return render(request, 'index.html', context)
+
+def feed(request):
+    if request.method == "POST":
+        feedback = FeedbackForm(request.POST)
+        if feedback.is_valid():
+            success = True
+            feedback.save()
+            context = {'feedback': feedback, 'success': success}
+        else:
+            feedback = FeedbackForm()
+            context = {'feedback': feedback}
+    else: 
+        feedback = FeedbackForm()
+        context = {'feedback': feedback}
+    return render(request, 'feedback.html', context)
 
 def main(request):
     if request.method == 'POST': # hva som skal skje når skjemaet sendes

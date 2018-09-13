@@ -2,13 +2,17 @@ from bootstrap_datepicker_plus import DatePickerInput
 from django import forms
 from django.forms import ModelForm
 
-from .models import Artikkel
+from .models import Artikkel, Feedback
 
 class ArtikkelForm(ModelForm):
 	class Meta:
 		model = Artikkel
 		fields = '__all__'
 
+class FeedbackForm(ModelForm):
+	class Meta: 
+		model = Feedback
+		fields = '__all__'
 
 class TestForm(ModelForm):
 	class Meta:

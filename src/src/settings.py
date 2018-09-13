@@ -23,7 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'i9%1nc@jxasu)rivx$dx62%e*b=@02481u#y&+@eur*e+#0sbx'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['lager.returkraft.no', '127.0.0.1']
 

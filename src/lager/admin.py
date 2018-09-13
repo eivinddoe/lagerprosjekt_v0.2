@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from .models import Artikkel, FastParameter
+from .models import Artikkel, FastParameter, Feedback
 
 @admin.register(Artikkel)
 class ArtikkelAdmin(admin.ModelAdmin):
@@ -11,3 +11,5 @@ class ArtikkelAdmin(admin.ModelAdmin):
 @admin.register(FastParameter)
 class FastParameterAdmin(admin.ModelAdmin):
 	list_display = ('parameter', 'parameter_verdi')
+
+admin.site.register(Feedback)
